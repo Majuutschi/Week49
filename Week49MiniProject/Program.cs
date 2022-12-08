@@ -1,5 +1,4 @@
-﻿
-
+﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Week49MiniProject;
@@ -126,7 +125,7 @@ void CreateNewPhone()
     Context.SaveChanges();
 
     Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"{Phone1.Brand} {Phone1.Model} was successfully added to the ToDo List!");
+    Console.WriteLine($"{Phone1.Brand} {Phone1.Model} was successfully added!");
     Console.ResetColor();
 
     ShowAddAssetMenu();
@@ -202,24 +201,170 @@ void CreateNewComputer()
     Context.SaveChanges();
 
     Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"{Computer1.Brand} {Computer1.Model} was successfully added to the ToDo List!");
+    Console.WriteLine($"{Computer1.Brand} {Computer1.Model} was successfully added!");
     Console.ResetColor();
 
     ShowAddAssetMenu();
 }
 
 
+// List with IDs
+void ListForEditAsset()
+{
+    Console.WriteLine("Id".PadRight(6) + "Type".PadRight(15) + "Brand".PadRight(15) + "Model".PadRight(15) + "Office".PadRight(15) + "Purchase Date".PadRight(15) + "Price in USD".PadRight(15) + "Currency".PadRight(15) + "Local price today");
+    Console.WriteLine("--".PadRight(5) + "----".PadRight(15) + "-----".PadRight(15) + "-----".PadRight(15) + "------".PadRight(15) + "-------------".PadRight(15) + "------------".PadRight(15) + "--------".PadRight(15) + "-----------------");
+
+    List<Asset> editAssetsList = Context.Assets.OrderBy(asset => asset.Id).ToList();
+
+    foreach (Asset asset in editAssetsList)
+    {
+        Console.WriteLine(asset.Id.ToString().PadRight(6) + asset.Type.PadRight(15) + asset.Brand.PadRight(15) + asset.Model.PadRight(15) + asset.Office.PadRight(15) + asset.PurchaseDate.ToString().PadRight(15) + asset.Price.ToString().PadRight(15) + asset.Currency.ToUpper().PadRight(15) + asset.LocalPrice);
+    }
+}
+
 // Update Asset
 void UpdateAsset()
 {
+    ListForEditAsset();
+    Console.WriteLine("Enter the Id for the Asset you want to Update");
+    string updateAsset = Console.ReadLine();
 
+    Asset AssetToUpdate = Context.Assets.FirstOrDefault(x => x.Id == Convert.ToInt32(updateAsset));
+
+    Console.WriteLine($"Type: {AssetToUpdate.Type}");
+    Console.WriteLine("Update Type? y/n");
+    string typeUpdate = Console.ReadLine();
+
+    if (typeUpdate == "y")
+    {
+        Console.WriteLine("Select Type: \"P\" for Phone, \"C\" for Computer");
+        string select = Console.ReadLine();
+
+        if (select.ToLower().Trim() == "p")
+        {
+            AssetToUpdate.Type = "Phone";
+        }
+        else if (select.ToLower().Trim() == "c")
+        {
+            AssetToUpdate.Type = "Computer";
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Not a valid option");
+            Console.ResetColor();
+
+            ShowEditAssetMenu();
+        }
+    }
+
+    Console.WriteLine($"Brand: {AssetToUpdate.Brand}");
+    Console.WriteLine("Update Brand? y/n");
+    string brandUpdate = Console.ReadLine();
+
+    if (brandUpdate == "y")
+    {
+        Console.WriteLine("Enter Brand: ");
+        string brand = Console.ReadLine();
+        AssetToUpdate.Brand = brand;
+    }
+
+    Console.WriteLine($"Model: {AssetToUpdate.Model}");
+    Console.WriteLine("Update Model? y/n");
+    string modelUpdate = Console.ReadLine();
+
+    if (modelUpdate == "y")
+    {
+        Console.WriteLine("Enter Model: ");
+        string model = Console.ReadLine();
+        AssetToUpdate.Model = model;
+    }
+
+    Console.WriteLine($"Price: {AssetToUpdate.Price}");
+    Console.WriteLine("Update Price? y/n");
+    string priceUpdate = Console.ReadLine();
+
+    if (priceUpdate == "y")
+    {
+        Console.WriteLine("Enter Price: ");
+        double price = Convert.ToDouble(Console.ReadLine());
+        AssetToUpdate.Price = price;
+    }
+
+    Console.WriteLine($"Office: {AssetToUpdate.Office}");
+    Console.WriteLine("Update Office? y/n");
+    string officeUpdate = Console.ReadLine();
+
+    if (officeUpdate == "y")
+    {
+        Console.WriteLine("Select \"Sw\" for Sweden, \"Sp\" for Spain or \"U\" for USA");
+        string office = Console.ReadLine();
+        if (office.ToLower().Trim() == "sw")
+        {
+            AssetToUpdate.Office = "Sweden";
+            AssetToUpdate.Currency = "SEK";
+            AssetToUpdate.LocalPrice = AssetToUpdate.Price * 10.89;
+        }
+        else if (office.ToLower().Trim() == "sp")
+        {
+            AssetToUpdate.Office = "Spain";
+            AssetToUpdate.Currency = "EUR";
+            AssetToUpdate.LocalPrice = AssetToUpdate.Price * 0.99;
+        }
+        else if (office.ToLower().Trim() == "u")
+        {
+            AssetToUpdate.Office = "USA";
+            AssetToUpdate.Currency = "USD";
+            AssetToUpdate.LocalPrice = AssetToUpdate.Price;
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Not a valid office");
+            Console.ResetColor();
+        }
+    }
+
+
+    // Save Changes
+    Context.Assets.Update(AssetToUpdate);
+    Context.SaveChanges();
+
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"{AssetToUpdate.Brand} {AssetToUpdate.Model} was successfully updated!");
+    Console.ResetColor();
+
+    ShowEditAssetMenu();
 }
 
 
 // Delete Asset
 void DeleteAsset()
 {
+    ListForEditAsset();
+    Console.WriteLine("Enter the Id for the Asset you want to Delete");
+    string deleteAsset = Console.ReadLine();
 
+    Asset RemoveAsset = Context.Assets.FirstOrDefault(x => x.Id == Convert.ToInt32(deleteAsset));
+
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine($"Do you want to delete {RemoveAsset.Brand} {RemoveAsset.Model}? y/n");
+    string remove = Console.ReadLine();
+    Console.ResetColor();
+    
+    if (remove == "y")
+    {
+        Context.Assets.Remove(RemoveAsset);
+        Context.SaveChanges();
+
+        ListForEditAsset();
+
+        ShowEditAssetMenu();
+    }
+    else
+    {
+        ShowEditAssetMenu();
+    }
 }
 
 
@@ -294,7 +439,6 @@ void ShowListByType()
 
     ShowMainMenu();
 }
-
 
 
 // Asset Menu Options
