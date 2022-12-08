@@ -15,6 +15,17 @@ bool showEditMenuAgain = true;
 
 List<Asset> Assets = Context.Assets.ToList();
 
+// Some assets to the list
+Asset p1 = new Phone("Phone", "Iphone", "8", "Spain", "12/29/2018", Convert.ToDateTime("12/29/2018"), 970, "EUR", 801.65);
+Context.Assets.Add(p1);
+Asset c1 = new Computer("Computer", "HP", "Elitebook", "Spain", "06/01/2019", Convert.ToDateTime("06/01/2019"), 1423, "EUR", 1176.03);
+Context.Assets.Add(c1);
+Asset p2 = new Phone("Phone", "Iphone", "11", "USA", "09/25/2020", Convert.ToDateTime("09/25/2020"), 990, "USD", 990);
+Context.Assets.Add(p2);
+Asset p3 = new Phone("Phone", "Iphone", "X", "Sweden", "07/15/2018", Convert.ToDateTime("07/15/2018"), 1245, "SEK", 10375);
+Context.Assets.Add(p3);
+Context.SaveChanges();
+
 
 // Main menu 
 void ShowMainMenu()
